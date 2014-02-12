@@ -130,38 +130,37 @@
 
 - (IBAction)duplicateProduct:(id)sender
 {
-	if (![self currentProduct])
-		return;
-	
-	// This saves the current license template
-	[self saveProducts:self];
-	
-	// Copy the files
-	NSFileManager *fm = [NSFileManager defaultManager];
-	NSString *oldProduct = [self currentProduct];
-	
-	// Figure out which copy we are on
-	NSString *copy = @" Copy";
-	int i = 1;
-	while ([productArray containsObject:[oldProduct stringByAppendingString:copy]])
-		copy = [NSString stringWithFormat:@" Copy %i", i++];
-	
-	NSString *templateDir = [DATADIR_PATH stringByAppendingPathComponent:@"License Templates"];
-	NSString *oldTemplateProductPath = [templateDir stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.plist", oldProduct]];
-	NSString *newTemplateProductPath = [templateDir stringByAppendingPathComponent:[NSString stringWithFormat:@"%@%@.plist", oldProduct, copy]];
-	NSString *keyDir = [DATADIR_PATH stringByAppendingPathComponent:@"Product Keys"];
-	NSString *oldKeyProductPath = [keyDir stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.plist", oldProduct]];
-	NSString *newKeyProductPath = [keyDir stringByAppendingPathComponent:[NSString stringWithFormat:@"%@%@.plist", oldProduct, copy]];
-
-	[fm copyItemAtPath:oldTemplateProductPath toPath:newTemplateProductPath error:NULL];
-	[fm copyItemAtPath:oldKeyProductPath toPath:newKeyProductPath error:NULL];
-	
-	[productArray addObject:[oldProduct stringByAppendingString:copy]];
-	[productArray sortUsingSelector:@selector(caseInsensitiveCompare:)];
-	[productTable reloadData];
-	// Select the copy
-	[productTable selectRowIndexes:[NSIndexSet indexSetWithIndex:[productArray indexOfObject:[oldProduct stringByAppendingString:copy]]]
-			  byExtendingSelection:NO];
+    NSString *oldProduct = [self currentProduct];    
+	if (oldProduct) {
+        // This saves the current license template
+        [self saveProducts:self];
+        
+        // Copy the files
+        NSFileManager *fm = [NSFileManager defaultManager];
+        
+        // Figure out which copy we are on
+        NSString *copy = @" Copy";
+        int i = 1;
+        while ([productArray containsObject:[oldProduct stringByAppendingString:copy]])
+            copy = [NSString stringWithFormat:@" Copy %i", i++];
+        
+        NSString *templateDir = [DATADIR_PATH stringByAppendingPathComponent:@"License Templates"];
+        NSString *oldTemplateProductPath = [templateDir stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.plist", oldProduct]];
+        NSString *newTemplateProductPath = [templateDir stringByAppendingPathComponent:[NSString stringWithFormat:@"%@%@.plist", oldProduct, copy]];
+        NSString *keyDir = [DATADIR_PATH stringByAppendingPathComponent:@"Product Keys"];
+        NSString *oldKeyProductPath = [keyDir stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.plist", oldProduct]];
+        NSString *newKeyProductPath = [keyDir stringByAppendingPathComponent:[NSString stringWithFormat:@"%@%@.plist", oldProduct, copy]];
+        
+        [fm copyItemAtPath:oldTemplateProductPath toPath:newTemplateProductPath error:NULL];
+        [fm copyItemAtPath:oldKeyProductPath toPath:newKeyProductPath error:NULL];
+        
+        [productArray addObject:[oldProduct stringByAppendingString:copy]];
+        [productArray sortUsingSelector:@selector(caseInsensitiveCompare:)];
+        [productTable reloadData];
+        // Select the copy
+        [productTable selectRowIndexes:[NSIndexSet indexSetWithIndex:[productArray indexOfObject:[oldProduct stringByAppendingString:copy]]]
+                  byExtendingSelection:NO];
+    }
 }
 
 - (IBAction)sheetOK:(id)sender
